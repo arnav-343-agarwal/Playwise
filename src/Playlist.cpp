@@ -43,6 +43,31 @@ void Playlist::deleteSong(int index) {
     size--;
 }
 
+// Remove a song by its unique ID
+void Playlist::removeSong(const string& id) {
+    SongNode* node = findNodeById(id);
+    if (!node) return;
+
+    if (node->prev) node->prev->next = node->next;
+    else head = node->next;
+
+    if (node->next) node->next->prev = node->prev;
+    else tail = node->prev;
+
+    delete node;
+    size--;
+}
+
+// Find node by song ID
+SongNode* Playlist::findNodeById(const string& id) {
+    SongNode* current = head;
+    while (current) {
+        if (current->data.id == id) return current;
+        current = current->next;
+    }
+    return nullptr;
+}
+
 // Move a song from one index to another
 void Playlist::moveSong(int fromIndex, int toIndex) {
     if (fromIndex < 0 || fromIndex >= size || toIndex < 0 || toIndex >= size || fromIndex == toIndex) return;
@@ -115,7 +140,12 @@ void Playlist::printPlaylist() {
         cout << "[" << index++ << "] "
              << current->data.title << " by "
              << current->data.artist << " (" << current->data.duration << "s)"
-             << endl;
+             << " [ID: " << current->data.id << "]" << endl;
         current = current->next;
     }
+}
+
+// Alias to match PlaylistManager expectation
+void Playlist::displaySongs() {
+    printPlaylist();
 }
